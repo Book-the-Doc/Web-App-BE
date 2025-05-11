@@ -1,0 +1,12 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo 'Checking for project formatting issues 🏗️👷'
+
+npm run format ||
+(
+    echo 'Formatting issues found ❌ Please run `npm run format` to fix this automatically.'
+    false
+)
+
+echo 'No formatting issues found ✅'

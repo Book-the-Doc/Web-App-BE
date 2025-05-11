@@ -14,8 +14,5 @@ router.post("/register/center", registerCenter);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/refresh", tokenRefresh);
-router.get("/logout", (req: Request, res: Response) => {
-  res.send("logout");
-});
 
 export default router;
