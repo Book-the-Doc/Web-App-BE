@@ -84,7 +84,7 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!user) {
       user = await Center.findOne({ email });
       if (!user) {
-        res.status(400).json({ message: "Invalid credentials1" });
+        res.status(404).json({ message: "Invalid credentials1" });
         return;
       }
     }
