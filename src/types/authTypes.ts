@@ -8,4 +8,3 @@ export type TJwtPayload = {
 };
 
 export type TRoles = "medicalCenter" | "patient";
-

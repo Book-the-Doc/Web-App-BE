@@ -107,7 +107,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     if (!accessTokenSecret || !refreshTokenSecret) {
       throw new Error(
-        "Access token secret or refresh token secret not defined"
+        "Access token secret or refresh token secret not defined",
       );
     }
 

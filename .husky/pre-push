@@ -1,1 +1,13 @@
-npm run build
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo 'Checking for project formatting issues 🏗️👷'
+
+npm run build ||
+(
+    echo 'Build issues found ❌'
+    false
+)
+
+echo 'No building issues found ✅'
+echo 'Pushing changes... 🚀'

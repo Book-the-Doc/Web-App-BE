@@ -1,5 +1,5 @@
-import { Request } from 'express';
-import { TJwtUser } from '../types/authTypes';
+import { Request } from "express";
+import { TJwtUser } from "../types/authTypes";
 
 interface IRequestWithUser extends Request {
   user: TJwtUser;

@@ -3,7 +3,11 @@ import { verify } from "jsonwebtoken";
 import { TJwtPayload } from "../types/authTypes";
 import IRequestWithUser from "../interfaces/requestWithUser.interface";
 
-const authGuard = (req: IRequestWithUser, res: Response, next: NextFunction) => {
+const authGuard = (
+  req: IRequestWithUser,
+  res: Response,
+  next: NextFunction,
+) => {
   const authHeader = req.header("Authorization");
 
   if (!authHeader) {
