@@ -19,41 +19,7 @@ export const loginUserService = async (email: string, password: string) => {
     throw new Error("Invalid credentials");
   }
 
-  const payload: TJwtPayload = {
-    user: {
-      id: user.id,
-      role: user.role,
-    },
-  };
-
-  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-  const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
-
-  if (!accessTokenSecret || !refreshTokenSecret) {
-    throw new Error("Access token secret or refresh token secret not defined");
-  }
-
-  const accessToken = jwt.sign(payload, accessTokenSecret, {
-    expiresIn: "1m",
-  });
-
-  const refreshToken = jwt.sign(payload, refreshTokenSecret, {
-    expiresIn: "7d",
-  });
-
-  const refreshTokenDoc = new RefreshToken({
-    token: refreshToken,
-    userId: user.id,
-  });
-  await refreshTokenDoc.save();
-
-  return {
-    accessToken,
-    refreshToken,
-    userId: user.id,
-    userRole: user.role,
-    expiredAt: new Date(Date.now() + 3600000),
-  };
+  return createTokens(user.id, user.role);
 };
 
 export const refreshAccessTokenService = async (
@@ -176,4 +142,60 @@ export const registerCenterService = async (
   });
   await newUser.save();
   return { message: "Registration Success" };
+};
+
+export const getUserByEmail = async (email: string) => {
+  const patient = await Patient.findOne({ email, googleUserId: null });
+  let center = null;
+  if (!patient) {
+    center = await Center.findOne({ email, googleUserId: null });
+  }
+  return patient || center;
+};
+
+export const getGoogleUserById = async (googleUserId: string) => {
+  const patient = await Patient.findOne({ googleUserId });
+  let center = null;
+  if (!patient) {
+    center = await Center.findOne({ googleUserId });
+  }
+  return patient || center;
+};
+
+export const createTokens = async (id: string, role: string) => {
+  const payload: TJwtPayload = {
+    user: {
+      id,
+      role,
+    },
+  };
+
+  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+  const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
+
+  if (!accessTokenSecret || !refreshTokenSecret) {
+    throw new Error("Access token secret or refresh token secret not defined");
+  }
+
+  const accessToken = jwt.sign(payload, accessTokenSecret, {
+    expiresIn: "1m",
+  });
+
+  const refreshToken = jwt.sign(payload, refreshTokenSecret, {
+    expiresIn: "7d",
+  });
+
+  const refreshTokenDoc = new RefreshToken({
+    token: refreshToken,
+    userId: id,
+  });
+  await refreshTokenDoc.save();
+
+  return {
+    accessToken,
+    refreshToken,
+    userId: id,
+    userRole: role,
+    expiredAt: new Date(Date.now() + 3600000),
+  };
 };

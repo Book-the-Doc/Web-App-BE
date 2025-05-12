@@ -37,6 +37,11 @@ const medicalCenterSchema = new Schema({
     type: String,
     default: "medicalCenter",
   },
+  googleUserId: {
+    type: String,
+    required: false,
+    default: null,
+  },
 });
 
 export default model("MedicalCenter", medicalCenterSchema);
