@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import { verify } from "jsonwebtoken";
-import { TJwtPayload } from "../types/authTypes";
-import IRequestWithUser from "../interfaces/requestWithUser.interface";
+import { TJwtPayload } from "../types/auth.type";
+import IRequestWithUser from "../interfaces/request-with-user.interface";
 
 const authGuard = (
   req: IRequestWithUser,
