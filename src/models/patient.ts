@@ -30,6 +30,11 @@ const patientSchema = new Schema({
     type: String,
     default: "patient",
   },
+  googleUserId: {
+    type: String,
+    required: false,
+    default: null,
+  },
 });
 
 export default model("Patient", patientSchema);

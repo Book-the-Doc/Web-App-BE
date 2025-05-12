@@ -1,6 +1,9 @@
 import RefreshToken from "../models/refresh-token";
 import { Request, Response } from "express";
 import {
+  createTokens,
+  getGoogleUserById,
+  getUserByEmail,
   loginUserService,
   refreshAccessTokenService,
   registerCenterService,
@@ -99,10 +102,36 @@ export const tokenRefresh = async (req: Request, res: Response) => {
   }
 };
 
-export const googleAuthCallback = (req: Request, res: Response) => {
-  // You can access the authenticated user with req.user
-  // You can also issue JWTs here if needed
-
-  // Example: res.json(req.user); or redirect
-  res.redirect(process.env.FRONTEND_URL!);
+export const googleAuthCallback = async (req: Request, res: Response) => {
+  const user = req.user as Express.User & {
+    emails: { value: string; verified: boolean }[];
+    displayName: string;
+    id: string;
+    photos?: { value: string }[];
+  };
+  const existingUser = await getUserByEmail(user.emails[0].value);
+  if (existingUser) {
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/login?error=google-account-not-linked`,
+    );
+  }
+  const googleUser = await getGoogleUserById(user.id);
+  if (googleUser) {
+    const result = await createTokens(googleUser.id, googleUser.role);
+    const cookiePayload = {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      userId: googleUser.id,
+      userRole: googleUser.role,
+      expiredAt: new Date(Date.now() + 3600000),
+    };
+    res.cookie("session", JSON.stringify(cookiePayload), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 3600000,
+    });
+    return res.redirect(process.env.FRONTEND_URL!);
+  }
+  res.redirect(`${process.env.FRONTEND_URL!}/register?googleId=${user.id}`);
 };
