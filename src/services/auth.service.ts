@@ -2,7 +2,7 @@ import Patient from "../models/patient";
 import Center from "../models/center";
 import RefreshToken from "../models/refresh-token";
 import jwt from "jsonwebtoken";
-import { Gender, TJwtPayload } from "../types/auth.type";
+import { Gender, TJwtPayload, TRoles } from "../types/auth.type";
 import { genSalt, hash, compare } from "bcrypt";
 
 export const loginUserService = async (email: string, password: string) => {
@@ -32,7 +32,7 @@ export const refreshAccessTokenService = async (
 
   const tokenDoc = await RefreshToken.findOne({
     token: refreshToken,
-    userId: userId,
+    user_id: userId,
     expires: { $gt: Date.now() },
   });
 
@@ -92,7 +92,7 @@ export const registerPatientService = async (
   phone: string,
   date_of_birth: Date,
   blood_type: string,
-  googleId: string,
+  google_id: string,
   gender: Gender,
   emergency_contact_relation: string,
   emergency_contact_name: string,
@@ -114,14 +114,14 @@ export const registerPatientService = async (
     phone,
     date_of_birth,
     blood_type,
-    googleId,
+    google_id,
     gender,
     emergency_contact_relation,
     emergency_contact_name,
     emergency_contact_phone,
   });
   await newUser.save();
-  if (googleId) {
+  if (google_id) {
     return createTokens(newUser.id, newUser.role);
   }
 
@@ -129,14 +129,18 @@ export const registerPatientService = async (
 };
 
 export const registerCenterService = async (
-  name: string,
   email: string,
-  medicalNumber: string,
   password: string,
-  district: string,
-  city: string,
-  zipCode: string,
   phone: string,
+  center_name: string,
+  address?: string,
+  geo_location?: {
+    lat: number;
+    lng: number;
+  },
+  web_site_url?: string,
+  image_url?: string,
+  google_id?: string,
 ) => {
   const existingUser = await Center.findOne({ email });
   if (existingUser) {
@@ -145,38 +149,42 @@ export const registerCenterService = async (
   const salt = await genSalt(10);
   const hashedPassword = await hash(password, salt);
   const newUser = new Center({
-    name,
     email,
-    medicalNumber,
-    password: hashedPassword,
-    district,
-    city,
-    zipCode,
+    password: password !== "" ? hashedPassword : "",
     phone,
+    center_name,
+    address,
+    geo_location,
+    web_site_url,
+    image_url,
+    google_id,
   });
   await newUser.save();
+  if (google_id) {
+    return createTokens(newUser.id, newUser.role);
+  }
   return { message: "Registration Success" };
 };
 
 export const getUserByEmail = async (email: string) => {
-  const patient = await Patient.findOne({ email, googleId: null });
+  const patient = await Patient.findOne({ email, google_id: null });
   let center = null;
   if (!patient) {
-    center = await Center.findOne({ email, googleId: null });
+    center = await Center.findOne({ email, google_id: null });
   }
   return patient || center;
 };
 
 export const getGoogleUserById = async (googleId: string) => {
-  const patient = await Patient.findOne({ googleId });
+  const patient = await Patient.findOne({ google_id: googleId });
   let center = null;
   if (!patient) {
-    center = await Center.findOne({ googleId });
+    center = await Center.findOne({ google_id: googleId });
   }
   return patient || center;
 };
 
-export const createTokens = async (id: string, role: string) => {
+export const createTokens = async (id: string, role: TRoles) => {
   const payload: TJwtPayload = {
     user: {
       id,
@@ -201,7 +209,8 @@ export const createTokens = async (id: string, role: string) => {
 
   const refreshTokenDoc = new RefreshToken({
     token: refreshToken,
-    userId: id,
+    user_id: id,
+    user_type: role,
   });
   await refreshTokenDoc.save();
 

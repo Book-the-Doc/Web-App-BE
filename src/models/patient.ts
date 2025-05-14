@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { TRoles } from "../types/auth.type";
 
 const patientSchema = new Schema({
   first_name: {
@@ -27,12 +28,13 @@ const patientSchema = new Schema({
   },
   role: {
     type: String,
+    enum: ["patient"],
     default: "patient",
   },
   blood_type: {
     type: String,
   },
-  googleId: {
+  google_id: {
     type: String || null,
     required: false,
     default: null,
