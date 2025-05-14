@@ -8,3 +8,5 @@ export type TJwtPayload = {
 };
 
 export type TRoles = "medicalCenter" | "patient";
+
+export type Gender = "Male" | "Female" | "Other" | "Prefer not to say";

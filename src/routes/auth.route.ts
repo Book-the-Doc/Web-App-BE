@@ -12,8 +12,8 @@ import "../config/passport";
 
 const router = Router();
 
-router.post("/register/patient", registerPatient);
-router.post("/register/center", registerCenter);
+router.post("/signUp/patient", registerPatient);
+router.post("/signUp/center", registerCenter);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/refresh", tokenRefresh);

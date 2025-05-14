@@ -11,16 +11,34 @@ import {
 } from "../services/auth.service";
 
 export const registerPatient = async (req: Request, res: Response) => {
-  const { name, address, phone, email, dob, password } = req.body;
-
+  const {
+    email,
+    password,
+    first_name,
+    last_name,
+    phone,
+    date_of_birth,
+    blood_type,
+    googleId,
+    gender,
+    emergency_contact_relation,
+    emergency_contact_name,
+    emergency_contact_phone,
+  } = req.body;
   try {
     const result = await registerPatientService(
-      name,
-      address,
-      phone,
       email,
-      dob,
       password,
+      first_name,
+      last_name,
+      phone,
+      date_of_birth,
+      blood_type,
+      googleId,
+      gender,
+      emergency_contact_relation,
+      emergency_contact_name,
+      emergency_contact_phone,
     );
     res.json(result);
   } catch (error: any) {
@@ -133,5 +151,7 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
     });
     return res.redirect(process.env.FRONTEND_URL!);
   }
-  res.redirect(`${process.env.FRONTEND_URL!}/register?googleId=${user.id}`);
+  res.redirect(
+    `${process.env.FRONTEND_URL!}/register?googleId=${user.id}&email=${encodeURIComponent(user.emails[0].value)}`,
+  );
 };
