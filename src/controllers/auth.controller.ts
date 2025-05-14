@@ -19,7 +19,7 @@ export const registerPatient = async (req: Request, res: Response) => {
     phone,
     date_of_birth,
     blood_type,
-    googleId,
+    google_id,
     gender,
     emergency_contact_relation,
     emergency_contact_name,
@@ -34,7 +34,7 @@ export const registerPatient = async (req: Request, res: Response) => {
       phone,
       date_of_birth,
       blood_type,
-      googleId,
+      google_id,
       gender,
       emergency_contact_relation,
       emergency_contact_name,
@@ -50,26 +50,40 @@ export const registerPatient = async (req: Request, res: Response) => {
 
 export const registerCenter = async (req: Request, res: Response) => {
   const {
-    name,
-    email,
-    medicalNumber,
+    center_name,
+    address,
+    geo_location,
+    web_site_url,
+    image_url,
     password,
-    district,
-    city,
-    zipCode,
+    google_id,
+    email,
     phone,
+  }: {
+    center_name: string;
+    address: string;
+    geo_location?: {
+      lat: number;
+      lng: number;
+    };
+    web_site_url?: string;
+    image_url?: string;
+    password: string;
+    google_id?: string;
+    email: string;
+    phone: string;
   } = req.body;
-
   try {
     const result = await registerCenterService(
-      name,
       email,
-      medicalNumber,
       password,
-      district,
-      city,
-      zipCode,
       phone,
+      center_name,
+      address,
+      geo_location,
+      web_site_url,
+      image_url,
+      google_id,
     );
     res.json(result);
   } catch (error: any) {
@@ -149,7 +163,7 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
       sameSite: "lax",
       maxAge: 3600000,
     });
-    return res.redirect(process.env.FRONTEND_URL!);
+    return res.redirect(`${process.env.FRONTEND_URL!}/dashboard`);
   }
   res.redirect(
     `${process.env.FRONTEND_URL!}/register?googleId=${user.id}&email=${encodeURIComponent(user.emails[0].value)}`,

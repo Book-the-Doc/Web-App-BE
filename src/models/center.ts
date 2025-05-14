@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 
 const medicalCenterSchema = new Schema({
-  name: {
+  center_name: {
     type: String,
     required: true,
   },
@@ -9,38 +9,50 @@ const medicalCenterSchema = new Schema({
     type: String,
     required: true,
   },
-  medicalNumber: {
+  phone: {
     type: String,
     required: true,
   },
   password: {
     type: String,
-    required: true,
-  },
-  district: {
-    type: String,
-    required: true,
-  },
-  city: {
-    type: String,
-    required: true,
-  },
-  zipCode: {
-    type: Number,
     required: false,
+    default: "",
   },
-  phone: {
+  address: {
     type: String,
     required: true,
+  },
+  web_site_url: {
+    type: String,
+    required: false,
   },
   role: {
     type: String,
+    enum: ["medicalCenter"],
     default: "medicalCenter",
   },
-  googleUserId: {
+  google_id: {
     type: String,
     required: false,
     default: null,
+  },
+  geo_location: {
+    lat: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+    lng: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+  },
+  doctor_ids: {
+    type: [Schema.Types.ObjectId],
+    ref: "Doctor",
+    required: false,
+    default: [],
   },
 });
 

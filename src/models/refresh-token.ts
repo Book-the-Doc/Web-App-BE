@@ -5,10 +5,15 @@ const refreshTokenSchema = new Schema({
     type: String,
     required: true,
   },
-  userId: {
+  user_id: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    refPath: "user_type",
     required: true,
+  },
+  user_type: {
+    type: String,
+    required: true,
+    enum: ["patient", "medicalCenter"],
   },
   expires: {
     type: Date,
