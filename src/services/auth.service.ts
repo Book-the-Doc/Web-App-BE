@@ -2,7 +2,7 @@ import Patient from "../models/patient";
 import Center from "../models/center";
 import RefreshToken from "../models/refresh-token";
 import jwt from "jsonwebtoken";
-import { TJwtPayload } from "../types/auth.type";
+import { Gender, TJwtPayload } from "../types/auth.type";
 import { genSalt, hash, compare } from "bcrypt";
 
 export const loginUserService = async (email: string, password: string) => {
@@ -85,12 +85,18 @@ export const refreshAccessTokenService = async (
 };
 
 export const registerPatientService = async (
-  name: string,
-  address: string,
-  phone: string,
   email: string,
-  dob: string,
   password: string,
+  first_name: string,
+  last_name: string,
+  phone: string,
+  date_of_birth: Date,
+  blood_type: string,
+  googleId: string,
+  gender: Gender,
+  emergency_contact_relation: string,
+  emergency_contact_name: string,
+  emergency_contact_phone: string,
 ) => {
   const existingUser = await Patient.findOne({ email });
   if (existingUser) {
@@ -101,15 +107,23 @@ export const registerPatientService = async (
   const hashedPassword = await hash(password, salt);
 
   const newUser = new Patient({
-    name,
-    address,
-    phone,
     email,
-    password: hashedPassword,
-    dob,
+    password: password !== "" ? hashedPassword : "",
+    first_name,
+    last_name,
+    phone,
+    date_of_birth,
+    blood_type,
+    googleId,
+    gender,
+    emergency_contact_relation,
+    emergency_contact_name,
+    emergency_contact_phone,
   });
-
   await newUser.save();
+  if (googleId) {
+    return createTokens(newUser.id, newUser.role);
+  }
 
   return { message: "Registration Success" };
 };
@@ -145,19 +159,19 @@ export const registerCenterService = async (
 };
 
 export const getUserByEmail = async (email: string) => {
-  const patient = await Patient.findOne({ email, googleUserId: null });
+  const patient = await Patient.findOne({ email, googleId: null });
   let center = null;
   if (!patient) {
-    center = await Center.findOne({ email, googleUserId: null });
+    center = await Center.findOne({ email, googleId: null });
   }
   return patient || center;
 };
 
-export const getGoogleUserById = async (googleUserId: string) => {
-  const patient = await Patient.findOne({ googleUserId });
+export const getGoogleUserById = async (googleId: string) => {
+  const patient = await Patient.findOne({ googleId });
   let center = null;
   if (!patient) {
-    center = await Center.findOne({ googleUserId });
+    center = await Center.findOne({ googleId });
   }
   return patient || center;
 };

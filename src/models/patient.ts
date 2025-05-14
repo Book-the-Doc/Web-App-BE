@@ -1,15 +1,14 @@
 import { Schema, model } from "mongoose";
 
 const patientSchema = new Schema({
-  name: {
+  first_name: {
     type: String,
     required: true,
   },
-  address: {
+  last_name: {
     type: String,
-    required: false,
+    required: true,
   },
-
   phone: {
     type: String,
     required: true,
@@ -18,22 +17,38 @@ const patientSchema = new Schema({
     type: String,
     required: true,
   },
-  dob: {
+  date_of_birth: {
     type: Date,
     required: true,
   },
   password: {
     type: String,
-    required: true,
+    default: "",
   },
   role: {
     type: String,
     default: "patient",
   },
-  googleUserId: {
+  blood_type: {
     type: String,
+  },
+  googleId: {
+    type: String || null,
     required: false,
     default: null,
+  },
+  gender: {
+    type: String,
+    enum: ["Male", "Female", "Other", "Prefer not to say"],
+  },
+  emergency_contact_relation: {
+    type: String,
+  },
+  emergency_contact_name: {
+    type: String,
+  },
+  emergency_contact_phone: {
+    type: String,
   },
 });
 
