@@ -1,6 +1,7 @@
 import RefreshToken from "../models/refresh-token";
 import { Request, Response } from "express";
 import {
+  createEmailResetToken,
   createTokens,
   getGoogleUserById,
   getUserByEmail,
@@ -8,6 +9,9 @@ import {
   refreshAccessTokenService,
   registerCenterService,
   registerPatientService,
+  resetPasswordService,
+  sendEmail,
+  validateEmailResetToken,
 } from "../services/auth.service";
 
 export const registerPatient = async (req: Request, res: Response) => {
@@ -168,4 +172,44 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
   res.redirect(
     `${process.env.FRONTEND_URL!}/register?googleId=${user.id}&email=${encodeURIComponent(user.emails[0].value)}`,
   );
+};
+
+export const forgotPasswordEmailCheck = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { email } = req.body;
+  try {
+    const user = await getUserByEmail(email);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    const emailResetToken = await createEmailResetToken(user._id, user.role);
+    await sendEmail(email, "Reset Password", "reset-password", {
+      resetLink: `${process.env.FRONTEND_URL}/forgot-password/reset-password?token=${emailResetToken}`,
+      name: (user as any).first_name || (user as any).center_name,
+    });
+    res.status(200).json({ message: "Reset password email sent" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { token, newPassword, forgotPasswordEmail } = req.body;
+  try {
+    const user = await validateEmailResetToken(token, forgotPasswordEmail);
+    if (!user) {
+      res.status(400).json({ message: "Invalid or expired token" });
+      return;
+    }
+    await resetPasswordService(user._id, newPassword, user.role);
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
