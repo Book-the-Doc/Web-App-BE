@@ -15,7 +15,6 @@ if (process.env.MAIL_ENV === "local") {
 } else {
   transporter = nodemailer.createTransport({
     service: process.env.SMTP_SERVICE,
-    port: Number(process.env.SMTP_PORT),
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
