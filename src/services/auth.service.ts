@@ -280,10 +280,7 @@ export const createEmailResetToken = async (
   return resetToken;
 };
 
-export const validateEmailResetToken = async (
-  token: string,
-  forgotPasswordEmail: string,
-) => {
+export const validateEmailResetToken = async (token: string) => {
   const decoded = jwt.verify(
     token,
     process.env.RESET_EMAIL_TOKEN_SECRET as string,
@@ -299,14 +296,12 @@ export const validateEmailResetToken = async (
       _id: userId,
       email_reset_token: token,
       email_reset_token_expired: { $gt: Date.now() },
-      email: forgotPasswordEmail,
     });
   } else {
     user = await Center.findOne({
       _id: userId,
       email_reset_token: token,
       email_reset_token_expired: { $gt: Date.now() },
-      email: forgotPasswordEmail,
     });
   }
   return user;

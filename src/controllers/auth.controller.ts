@@ -200,9 +200,9 @@ export const resetPassword = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { token, newPassword, forgotPasswordEmail } = req.body;
+  const { token, newPassword } = req.body;
   try {
-    const user = await validateEmailResetToken(token, forgotPasswordEmail);
+    const user = await validateEmailResetToken(token);
     if (!user) {
       res.status(400).json({ message: "Invalid or expired token" });
       return;
