@@ -54,6 +54,14 @@ const medicalCenterSchema = new Schema({
     required: false,
     default: [],
   },
+  email_reset_token: {
+    type: String,
+    default: null,
+  },
+  email_reset_token_expired: {
+    type: Date,
+    default: null,
+  },
 });
 
 export default model("MedicalCenter", medicalCenterSchema);

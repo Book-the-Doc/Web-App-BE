@@ -4,6 +4,10 @@ import RefreshToken from "../models/refresh-token";
 import jwt from "jsonwebtoken";
 import { Gender, TJwtPayload, TRoles } from "../types/auth.type";
 import { genSalt, hash, compare } from "bcrypt";
+import transporter from "../config/mail-transporter";
+import handlebars from "handlebars";
+import fs from "fs";
+import path from "path";
 
 export const loginUserService = async (email: string, password: string) => {
   let user = await Patient.findOne({ email });
@@ -221,4 +225,117 @@ export const createTokens = async (id: string, role: TRoles) => {
     userRole: role,
     expiredAt: new Date(Date.now() + 3600000),
   };
+};
+
+export const sendEmail = async (
+  email: string,
+  subject: string,
+  templateName: string,
+  context: object,
+) => {
+  const templatePath = path.resolve(`./src/templates/${templateName}.hbs`);
+  const source = fs.readFileSync(templatePath, "utf-8");
+  const template = handlebars.compile(source);
+  const mailOptions = {
+    from: "Book the Doc <service.book_the_doc@gmail.com>",
+    to: email,
+    subject,
+    html: template(context),
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw new Error("Failed to send email");
+  }
+};
+
+export const createEmailResetToken = async (
+  userId: object,
+  userRole: TRoles,
+) => {
+  const resetToken = jwt.sign(
+    { userId, userRole },
+    process.env.RESET_EMAIL_TOKEN_SECRET as string,
+    { expiresIn: "15m" },
+  );
+  if (userRole === "patient") {
+    await Patient.updateOne(
+      { _id: userId },
+      {
+        email_reset_token: resetToken,
+        email_reset_token_expired: Date.now() + 15 * 60 * 1000,
+      },
+    );
+  } else {
+    await Center.updateOne(
+      { _id: userId },
+      {
+        email_reset_token: resetToken,
+        email_reset_token_expired: Date.now() + 15 * 60 * 1000,
+      },
+    );
+  }
+  return resetToken;
+};
+
+export const validateEmailResetToken = async (
+  token: string,
+  forgotPasswordEmail: string,
+) => {
+  const decoded = jwt.verify(
+    token,
+    process.env.RESET_EMAIL_TOKEN_SECRET as string,
+  );
+  if (!decoded || typeof decoded !== "object" || !("userId" in decoded)) {
+    throw new Error("Invalid or expired token");
+  }
+  const userId = decoded.userId;
+  const userRole = decoded.userRole;
+  let user;
+  if (userRole === "patient") {
+    user = await Patient.findOne({
+      _id: userId,
+      email_reset_token: token,
+      email_reset_token_expired: { $gt: Date.now() },
+      email: forgotPasswordEmail,
+    });
+  } else {
+    user = await Center.findOne({
+      _id: userId,
+      email_reset_token: token,
+      email_reset_token_expired: { $gt: Date.now() },
+      email: forgotPasswordEmail,
+    });
+  }
+  return user;
+};
+
+export const resetPasswordService = async (
+  userId: object,
+  newPassword: string,
+  userRole: TRoles,
+) => {
+  const salt = await genSalt(10);
+  const hashedPassword = await hash(newPassword, salt);
+  if (userRole === "patient") {
+    await Patient.updateOne(
+      { _id: userId },
+      {
+        password: hashedPassword,
+        email_reset_token: null,
+        email_reset_token_expired: null,
+      },
+    );
+  } else {
+    await Center.updateOne(
+      { _id: userId },
+      {
+        password: hashedPassword,
+        email_reset_token: null,
+        email_reset_token_expired: null,
+      },
+    );
+  }
 };

@@ -52,6 +52,14 @@ const patientSchema = new Schema({
   emergency_contact_phone: {
     type: String,
   },
+  email_reset_token: {
+    type: String,
+    default: null,
+  },
+  email_reset_token_expired: {
+    type: Date,
+    default: null,
+  },
 });
 
 export default model("Patient", patientSchema);

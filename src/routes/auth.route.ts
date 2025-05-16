@@ -6,6 +6,8 @@ import {
   logoutUser,
   tokenRefresh,
   googleAuthCallback,
+  forgotPasswordEmailCheck,
+  resetPassword,
 } from "../controllers/auth.controller";
 import passport from "passport";
 import "../config/passport";
@@ -17,6 +19,7 @@ router.post("/signUp/center", registerCenter);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/refresh", tokenRefresh);
+router.post("/forgot-password", forgotPasswordEmailCheck);
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
@@ -29,5 +32,6 @@ router.get(
   }),
   googleAuthCallback,
 );
+router.post("/reset-password", resetPassword);
 
 export default router;
