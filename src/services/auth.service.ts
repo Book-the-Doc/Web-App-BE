@@ -2,7 +2,7 @@ import Patient from "../models/patient";
 import Center from "../models/center";
 import RefreshToken from "../models/refresh-token";
 import jwt from "jsonwebtoken";
-import { Gender, TJwtPayload, UserRole } from "../types/auth.type";
+import { Gender, TJwtPayload, TUserRole } from "../types/auth.type";
 import { genSalt, hash, compare } from "bcrypt";
 import transporter from "../config/mail-transporter";
 import handlebars from "handlebars";
@@ -36,7 +36,7 @@ export const refreshAccessTokenService = async (
 
   const tokenDoc = await RefreshToken.findOne({
     token: refreshToken,
-    user_id: userId,
+    userId: userId,
     expires: { $gt: Date.now() },
   });
 
@@ -167,7 +167,7 @@ export const getGoogleUserById = async (googleId: string) => {
   return patient || center;
 };
 
-export const createTokens = async (id: string, role: UserRole) => {
+export const createTokens = async (id: string, role: TUserRole) => {
   const payload: TJwtPayload = {
     user: {
       id,
@@ -192,8 +192,8 @@ export const createTokens = async (id: string, role: UserRole) => {
 
   const refreshTokenDoc = new RefreshToken({
     token: refreshToken,
-    user_id: id,
-    user_type: role,
+    userId: id,
+    userType: role,
   });
   await refreshTokenDoc.save();
 
@@ -232,7 +232,7 @@ export const sendEmail = async (
 
 export const createEmailResetToken = async (
   userId: object,
-  userRole: UserRole,
+  userRole: TUserRole,
 ) => {
   const resetToken = jwt.sign(
     { userId, userRole },
@@ -243,16 +243,16 @@ export const createEmailResetToken = async (
     await Patient.updateOne(
       { _id: userId },
       {
-        email_reset_token: resetToken,
-        email_reset_token_expired: Date.now() + 15 * 60 * 1000,
+        emailResetToken: resetToken,
+        emailResetTokenExpired: Date.now() + 15 * 60 * 1000,
       },
     );
   } else {
     await Center.updateOne(
       { _id: userId },
       {
-        email_reset_token: resetToken,
-        email_reset_token_expired: Date.now() + 15 * 60 * 1000,
+        emailResetToken: resetToken,
+        emailResetTokenExpired: Date.now() + 15 * 60 * 1000,
       },
     );
   }
@@ -273,14 +273,14 @@ export const validateEmailResetToken = async (token: string) => {
   if (userRole === "patient") {
     user = await Patient.findOne({
       _id: userId,
-      email_reset_token: token,
-      email_reset_token_expired: { $gt: Date.now() },
+      emailResetToken: token,
+      emailResetTokenExpired: { $gt: Date.now() },
     });
   } else {
     user = await Center.findOne({
       _id: userId,
-      email_reset_token: token,
-      email_reset_token_expired: { $gt: Date.now() },
+      emailResetToken: token,
+      emailResetTokenExpired: { $gt: Date.now() },
     });
   }
   return user;
@@ -289,7 +289,7 @@ export const validateEmailResetToken = async (token: string) => {
 export const resetPasswordService = async (
   userId: object,
   newPassword: string,
-  userRole: UserRole,
+  userRole: TUserRole,
 ) => {
   const salt = await genSalt(10);
   const hashedPassword = await hash(newPassword, salt);
@@ -298,8 +298,8 @@ export const resetPasswordService = async (
       { _id: userId },
       {
         password: hashedPassword,
-        email_reset_token: null,
-        email_reset_token_expired: null,
+        emailResetToken: null,
+        emailResetTokenExpired: null,
       },
     );
   } else {
@@ -307,8 +307,8 @@ export const resetPasswordService = async (
       { _id: userId },
       {
         password: hashedPassword,
-        email_reset_token: null,
-        email_reset_token_expired: null,
+        emailResetToken: null,
+        emailResetTokenExpired: null,
       },
     );
   }

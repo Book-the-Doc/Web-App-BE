@@ -7,6 +7,6 @@ export type TJwtPayload = {
   user: TJwtUser;
 };
 
-export type UserRole = "patient" | "center";
+export type TUserRole = "patient" | "center";
 
 export type Gender = "Male" | "Female" | "Other" | "Prefer not to say";
