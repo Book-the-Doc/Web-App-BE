@@ -1,16 +1,11 @@
 import { Schema, model } from "mongoose";
-import { TRoles } from "../types/auth.type";
 
 const patientSchema = new Schema({
-  first_name: {
+  firstName: {
     type: String,
     required: true,
   },
-  last_name: {
-    type: String,
-    required: true,
-  },
-  phone: {
+  lastName: {
     type: String,
     required: true,
   },
@@ -18,7 +13,12 @@ const patientSchema = new Schema({
     type: String,
     required: true,
   },
-  date_of_birth: {
+  gender: {
+    type: String,
+    enum: ["Male", "Female", "Other", "Prefer not to say"],
+    required: true,
+  },
+  dob: {
     type: Date,
     required: true,
   },
@@ -31,35 +31,44 @@ const patientSchema = new Schema({
     enum: ["patient"],
     default: "patient",
   },
-  blood_type: {
-    type: String,
-  },
-  google_id: {
+  googleId: {
     type: String || null,
+    default: null,
+  },
+  phone: {
+    type: String,
     required: false,
+  },
+  bloodType: {
+    type: String,
+    required: false,
+  },
+  emergencyContact: {
+    name: {
+      type: String,
+      required: false,
+    },
+    relation: {
+      type: String,
+      required: false,
+    },
+    phone: {
+      type: String,
+      required: false,
+    },
+  },
+  profilePicUrl: {
+    type: String,
+    required: false,
+  },
+  emailResetToken: {
+    type: String,
     default: null,
   },
-  gender: {
-    type: String,
-    enum: ["Male", "Female", "Other", "Prefer not to say"],
-  },
-  emergency_contact_relation: {
-    type: String,
-  },
-  emergency_contact_name: {
-    type: String,
-  },
-  emergency_contact_phone: {
-    type: String,
-  },
-  email_reset_token: {
-    type: String,
-    default: null,
-  },
-  email_reset_token_expired: {
+  emailResetTokenExpired: {
     type: Date,
     default: null,
   },
 });
 
-export default model("Patient", patientSchema);
+export default model("patient", patientSchema);

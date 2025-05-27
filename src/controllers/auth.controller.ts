@@ -13,36 +13,35 @@ import {
   sendEmail,
   validateEmailResetToken,
 } from "../services/auth.service";
+import { Gender } from "../types/auth.type";
 
 export const registerPatient = async (req: Request, res: Response) => {
   const {
+    firstName,
+    lastName,
     email,
-    password,
-    first_name,
-    last_name,
-    phone,
-    date_of_birth,
-    blood_type,
-    google_id,
     gender,
-    emergency_contact_relation,
-    emergency_contact_name,
-    emergency_contact_phone,
+    dob,
+    password,
+    googleId,
+  }: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    gender: Gender;
+    dob: Date;
+    password: string;
+    googleId?: string;
   } = req.body;
   try {
     const result = await registerPatientService(
+      firstName,
+      lastName,
       email,
-      password,
-      first_name,
-      last_name,
-      phone,
-      date_of_birth,
-      blood_type,
-      google_id,
       gender,
-      emergency_contact_relation,
-      emergency_contact_name,
-      emergency_contact_phone,
+      dob,
+      password,
+      googleId,
     );
     res.json(result);
   } catch (error: any) {
@@ -54,40 +53,25 @@ export const registerPatient = async (req: Request, res: Response) => {
 
 export const registerCenter = async (req: Request, res: Response) => {
   const {
-    center_name,
-    address,
-    geo_location,
-    web_site_url,
-    image_url,
-    password,
-    google_id,
+    centerName,
     email,
     phone,
+    password,
+    googleId,
   }: {
-    center_name: string;
-    address: string;
-    geo_location?: {
-      lat: number;
-      lng: number;
-    };
-    web_site_url?: string;
-    image_url?: string;
-    password: string;
-    google_id?: string;
+    centerName: string;
     email: string;
     phone: string;
+    password: string;
+    googleId?: string;
   } = req.body;
   try {
     const result = await registerCenterService(
+      centerName,
       email,
-      password,
       phone,
-      center_name,
-      address,
-      geo_location,
-      web_site_url,
-      image_url,
-      google_id,
+      password,
+      googleId,
     );
     res.json(result);
   } catch (error: any) {
