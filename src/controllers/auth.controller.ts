@@ -22,6 +22,7 @@ export const registerPatient = async (req: Request, res: Response) => {
     gender,
     dob,
     password,
+    googleId,
   } = req.body;
   try {
     const result = await registerPatientService(
@@ -31,6 +32,7 @@ export const registerPatient = async (req: Request, res: Response) => {
       gender,
       dob,
       password,
+      googleId,
     );
     res.json(result);
   } catch (error: any) {
@@ -42,40 +44,25 @@ export const registerPatient = async (req: Request, res: Response) => {
 
 export const registerCenter = async (req: Request, res: Response) => {
   const {
-    center_name,
-    address,
-    geo_location,
-    web_site_url,
-    image_url,
-    password,
-    google_id,
+    centerName,
     email,
     phone,
+    password,
+    googleId,
   }: {
-    center_name: string;
-    address: string;
-    geo_location?: {
-      lat: number;
-      lng: number;
-    };
-    web_site_url?: string;
-    image_url?: string;
-    password: string;
-    google_id?: string;
+    centerName: string;
     email: string;
     phone: string;
+    password: string;
+    googleId?: string;
   } = req.body;
   try {
     const result = await registerCenterService(
+      centerName,
       email,
-      password,
       phone,
-      center_name,
-      address,
-      geo_location,
-      web_site_url,
-      image_url,
-      google_id,
+      password,
+      googleId,
     );
     res.json(result);
   } catch (error: any) {

@@ -33,23 +33,33 @@ const patientSchema = new Schema({
   },
   googleId: {
     type: String || null,
-    required: false,
     default: null,
   },
   phone: {
     type: String,
+    required: false,
   },
   bloodType: {
     type: String,
+    required: false,
   },
-  emergencyContactName: {
-    type: String,
+  emergencyContact: {
+    name: {
+      type: String,
+      required: false,
+    },
+    relation: {
+      type: String,
+      required: false,
+    },
+    phone: {
+      type: String,
+      required: false,
+    }
   },
-  emergencyContactRelation: {
+  profilePicUrl: {
     type: String,
-  },
-  emergencyContactPhone: {
-    type: String,
+    required: false,
   },
   emailResetToken: {
     type: String,
