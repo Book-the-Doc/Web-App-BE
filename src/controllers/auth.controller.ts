@@ -16,33 +16,21 @@ import {
 
 export const registerPatient = async (req: Request, res: Response) => {
   const {
+    firstName,
+    lastName,
     email,
-    password,
-    first_name,
-    last_name,
-    phone,
-    date_of_birth,
-    blood_type,
-    google_id,
     gender,
-    emergency_contact_relation,
-    emergency_contact_name,
-    emergency_contact_phone,
+    dob,
+    password,
   } = req.body;
   try {
     const result = await registerPatientService(
+      firstName,
+      lastName,
       email,
-      password,
-      first_name,
-      last_name,
-      phone,
-      date_of_birth,
-      blood_type,
-      google_id,
       gender,
-      emergency_contact_relation,
-      emergency_contact_name,
-      emergency_contact_phone,
+      dob,
+      password,
     );
     res.json(result);
   } catch (error: any) {

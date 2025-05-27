@@ -1,16 +1,11 @@
 import { Schema, model } from "mongoose";
-import { TRoles } from "../types/auth.type";
 
 const patientSchema = new Schema({
-  first_name: {
+  firstName: {
     type: String,
     required: true,
   },
-  last_name: {
-    type: String,
-    required: true,
-  },
-  phone: {
+  lastName: {
     type: String,
     required: true,
   },
@@ -18,7 +13,12 @@ const patientSchema = new Schema({
     type: String,
     required: true,
   },
-  date_of_birth: {
+  gender: {
+    type: String,
+    enum: ["Male", "Female", "Other", "Prefer not to say"],
+    required: true,
+  },
+  dob: {
     type: Date,
     required: true,
   },
@@ -31,32 +31,31 @@ const patientSchema = new Schema({
     enum: ["patient"],
     default: "patient",
   },
-  blood_type: {
-    type: String,
-  },
-  google_id: {
+  googleId: {
     type: String || null,
     required: false,
     default: null,
   },
-  gender: {
-    type: String,
-    enum: ["Male", "Female", "Other", "Prefer not to say"],
-  },
-  emergency_contact_relation: {
+  phone: {
     type: String,
   },
-  emergency_contact_name: {
+  bloodType: {
     type: String,
   },
-  emergency_contact_phone: {
+  emergencyContactName: {
     type: String,
   },
-  email_reset_token: {
+  emergencyContactRelation: {
+    type: String,
+  },
+  emergencyContactPhone: {
+    type: String,
+  },
+  emailResetToken: {
     type: String,
     default: null,
   },
-  email_reset_token_expired: {
+  emailResetTokenExpired: {
     type: Date,
     default: null,
   },

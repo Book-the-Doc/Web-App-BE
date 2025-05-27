@@ -89,18 +89,13 @@ export const refreshAccessTokenService = async (
 };
 
 export const registerPatientService = async (
+  firstName: string,
+  lastName: string,
   email: string,
-  password: string,
-  first_name: string,
-  last_name: string,
-  phone: string,
-  date_of_birth: Date,
-  blood_type: string,
-  google_id: string,
   gender: Gender,
-  emergency_contact_relation: string,
-  emergency_contact_name: string,
-  emergency_contact_phone: string,
+  dob: Date,
+  password: string,
+  googleId?: string,
 ) => {
   const existingUser = await Patient.findOne({ email });
   if (existingUser) {
@@ -111,21 +106,16 @@ export const registerPatientService = async (
   const hashedPassword = await hash(password, salt);
 
   const newUser = new Patient({
+    firstName,
+    lastName,
     email,
-    password: password !== "" ? hashedPassword : "",
-    first_name,
-    last_name,
-    phone,
-    date_of_birth,
-    blood_type,
-    google_id,
     gender,
-    emergency_contact_relation,
-    emergency_contact_name,
-    emergency_contact_phone,
+    dob,
+    password: password !== "" ? hashedPassword : "",
+    googleId,
   });
   await newUser.save();
-  if (google_id) {
+  if (googleId) {
     return createTokens(newUser.id, newUser.role);
   }
 
