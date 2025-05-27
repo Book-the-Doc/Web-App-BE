@@ -55,7 +55,7 @@ const patientSchema = new Schema({
     phone: {
       type: String,
       required: false,
-    }
+    },
   },
   profilePicUrl: {
     type: String,

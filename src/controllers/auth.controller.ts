@@ -13,6 +13,7 @@ import {
   sendEmail,
   validateEmailResetToken,
 } from "../services/auth.service";
+import { Gender } from "../types/auth.type";
 
 export const registerPatient = async (req: Request, res: Response) => {
   const {
@@ -23,6 +24,14 @@ export const registerPatient = async (req: Request, res: Response) => {
     dob,
     password,
     googleId,
+  }: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    gender: Gender;
+    dob: Date;
+    password: string;
+    googleId?: string;
   } = req.body;
   try {
     const result = await registerPatientService(
