@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const medicalCenterSchema = new Schema({
+const centerSchema = new Schema({
   centerName: {
     type: String,
     required: true,
@@ -60,4 +60,4 @@ const medicalCenterSchema = new Schema({
   },
 });
 
-export default model("MedicalCenter", medicalCenterSchema);
+export default model("center", centerSchema);

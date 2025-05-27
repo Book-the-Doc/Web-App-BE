@@ -7,7 +7,7 @@ const refreshTokenSchema = new Schema({
   },
   userId: {
     type: Schema.Types.ObjectId,
-    refPath: "user_type",
+    refPath: "userType",
     required: true,
   },
   userType: {
@@ -22,4 +22,4 @@ const refreshTokenSchema = new Schema({
   },
 });
 
-export default model("RefreshToken", refreshTokenSchema);
+export default model("refresh-token", refreshTokenSchema);

@@ -71,4 +71,4 @@ const patientSchema = new Schema({
   },
 });
 
-export default model("Patient", patientSchema);
+export default model("patient", patientSchema);
