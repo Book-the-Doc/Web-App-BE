@@ -172,7 +172,7 @@ export const forgotPasswordEmailCheck = async (
     const emailResetToken = await createEmailResetToken(user._id, user.role);
     await sendEmail(email, "Reset Password", "reset-password", {
       resetLink: `${process.env.FRONTEND_URL}/forgot-password/reset-password?token=${emailResetToken}`,
-      name: (user as any).first_name || (user as any).center_name,
+      name: (user as any).firstName || (user as any).centerName,
     });
     res.status(200).json({ message: "Reset password email sent" });
   } catch (error) {
