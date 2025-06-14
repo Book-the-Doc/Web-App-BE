@@ -201,7 +201,7 @@ export const createTokens = async (id: string, role: TUserRole) => {
     accessToken,
     refreshToken,
     userId: id,
-    userRole: role,
+    userType: role,
     expiredAt: new Date(Date.now() + 3600000),
   };
 };
