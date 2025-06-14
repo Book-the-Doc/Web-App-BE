@@ -95,9 +95,11 @@ export const registerPatientService = async (
   gender: Gender,
   dob: Date,
   password: string,
-  googleId?: string,
+  googleId: string,
 ) => {
-  const existingUser = await Patient.findOne({ email });
+  const existingPatient = await Patient.findOne({ email });
+  const existingCenter = await Center.findOne({ email });
+  const existingUser = existingPatient || existingCenter;
   if (existingUser) {
     throw new Error("User already exists");
   }
@@ -112,7 +114,7 @@ export const registerPatientService = async (
     gender,
     dob,
     password: password !== "" ? hashedPassword : "",
-    googleId,
+    googleId: googleId || null,
   });
   await newUser.save();
   if (googleId) {
@@ -127,7 +129,7 @@ export const registerCenterService = async (
   email: string,
   phone: string,
   password: string,
-  googleId?: string,
+  googleId: string,
 ) => {
   const existingUser = await Center.findOne({ email });
   if (existingUser) {
@@ -140,7 +142,7 @@ export const registerCenterService = async (
     email,
     phone,
     password: password !== "" ? hashedPassword : "",
-    googleId,
+    googleId: googleId || null,
   });
   await newUser.save();
   if (googleId) {
@@ -312,4 +314,23 @@ export const resetPasswordService = async (
       },
     );
   }
+};
+
+export const logoutUserService = async (
+  userId: string,
+  refreshToken: string,
+) => {
+  if (!refreshToken) {
+    throw new Error("Access Denied");
+  }
+  const tokenDoc = await RefreshToken.findOne({
+    token: refreshToken,
+    userId: userId,
+  });
+  console.log("Token Document:", tokenDoc);
+  if (!tokenDoc) {
+    throw new Error("Invalid Token");
+  }
+  await RefreshToken.deleteOne({ token: refreshToken });
+  return { message: "Logout Success" };
 };

@@ -33,5 +33,6 @@ router.get(
   googleAuthCallback,
 );
 router.post("/reset-password", resetPassword);
+router.post("/logout", logoutUser);
 
 export default router;
