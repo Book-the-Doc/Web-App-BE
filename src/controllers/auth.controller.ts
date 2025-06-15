@@ -100,11 +100,6 @@ export const logoutUser = async (req: Request, res: Response) => {
   try {
     const { userId, refreshToken } = req.body;
     await logoutUserService(userId, refreshToken);
-    res.clearCookie("session", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
     res.json({ message: "Logout Success" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
