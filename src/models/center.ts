@@ -8,6 +8,7 @@ const centerSchema = new Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   phone: {
     type: String,
@@ -58,6 +59,16 @@ const centerSchema = new Schema({
     type: Date,
     default: null,
   },
+  // New attribute to store references to doctors registered by this center
+  doctors: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Doctor',
+  }],
+  // New attribute to store references to sessions hosted by this center
+  sessions: [{
+      type: Schema.Types.ObjectId,
+      ref: 'DoctorSession',
+  }]
 });
 
 export default model("center", centerSchema);
