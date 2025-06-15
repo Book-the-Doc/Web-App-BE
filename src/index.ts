@@ -4,7 +4,7 @@ import connectDB from "./config/db";
 import authRoutes from "./routes/auth.route";
 import patientRoutes from "./routes/patient.route";
 import centerRoutes from "./routes/center.route";
-import doctorRoutes from "./routes/doctor.route"
+import doctorRoutes from "./routes/doctor.route";
 import cors from "cors";
 import session from "express-session";
 import passport from "passport";

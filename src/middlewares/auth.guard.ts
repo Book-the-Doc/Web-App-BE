@@ -5,7 +5,6 @@ import { TJwtPayload } from "../types/auth.type";
 const authGuard: RequestHandler = (req, res, next) => {
   const authHeader = req.header("Authorization");
 
-
   if (!authHeader) {
     res.status(401).json({ message: "No token, authorization denied" });
     return;

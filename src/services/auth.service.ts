@@ -18,7 +18,8 @@ import path from "path";
 export const loginUserService = async (email: string, password: string) => {
   // Correctly find a user in EITHER the Patient OR Center collection.
   // This works now because the fixed registration logic ensures emails are unique.
-  const user = (await Patient.findOne({ email })) || (await Center.findOne({ email }));
+  const user =
+    (await Patient.findOne({ email })) || (await Center.findOne({ email }));
 
   // If no user is found with that email, throw an error.
   if (!user) {
@@ -108,10 +109,12 @@ export const registerPatientService = async (
   gender: Gender,
   dob: Date,
   password: string,
-  googleId?: string,
+  googleId: string,
+  phone: string,
 ) => {
-  // FIX: Check for email existence in both collections to prevent duplicates.
-  const existingUser = (await Patient.findOne({ email })) || (await Center.findOne({ email }));
+  const existingPatient = await Patient.findOne({ email });
+  const existingCenter = await Center.findOne({ email });
+  const existingUser = existingPatient || existingCenter;
   if (existingUser) {
     throw new Error("User already exists");
   }
@@ -126,7 +129,8 @@ export const registerPatientService = async (
     gender,
     dob,
     password: password !== "" ? hashedPassword : "",
-    googleId,
+    googleId: googleId || null,
+    phone,
   });
   await newUser.save();
   if (googleId) {
@@ -145,10 +149,11 @@ export const registerCenterService = async (
   email: string,
   phone: string,
   password: string,
-  googleId?: string,
+  googleId: string,
 ) => {
   // FIX: Check for email existence in both collections to prevent duplicates.
-  const existingUser = (await Patient.findOne({ email })) || (await Center.findOne({ email }));
+  const existingUser =
+    (await Patient.findOne({ email })) || (await Center.findOne({ email }));
   if (existingUser) {
     throw new Error("User already exists");
   }
@@ -160,7 +165,7 @@ export const registerCenterService = async (
     email,
     phone,
     password: password !== "" ? hashedPassword : "",
-    googleId,
+    googleId: googleId || null,
   });
   await newUser.save();
   if (googleId) {
@@ -339,4 +344,23 @@ export const resetPasswordService = async (
       },
     );
   }
+};
+
+export const logoutUserService = async (
+  userId: string,
+  refreshToken: string,
+) => {
+  if (!refreshToken) {
+    throw new Error("Access Denied");
+  }
+  const tokenDoc = await RefreshToken.findOne({
+    token: refreshToken,
+    userId: userId,
+  });
+  console.log("Token Document:", tokenDoc);
+  if (!tokenDoc) {
+    throw new Error("Invalid Token");
+  }
+  await RefreshToken.deleteOne({ token: refreshToken });
+  return { message: "Logout Success" };
 };

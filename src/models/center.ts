@@ -60,15 +60,19 @@ const centerSchema = new Schema({
     default: null,
   },
   // New attribute to store references to doctors registered by this center
-  doctors: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Doctor',
-  }],
-  // New attribute to store references to sessions hosted by this center
-  sessions: [{
+  doctors: [
+    {
       type: Schema.Types.ObjectId,
-      ref: 'DoctorSession',
-  }]
+      ref: "Doctor",
+    },
+  ],
+  // New attribute to store references to sessions hosted by this center
+  sessions: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "DoctorSession",
+    },
+  ],
 });
 
 export default model("center", centerSchema);

@@ -7,7 +7,6 @@ import {
 import { TUpdatePatientPayload } from "../types/patient.type";
 
 export const getPatientById: RequestHandler = async (req, res) => {
-    
   try {
     const patient = await getPatientByIdService(req.params.id);
     if (!patient) {
@@ -24,7 +23,9 @@ export const updatePatient: RequestHandler = async (req, res) => {
   try {
     // Security check: ensure the logged-in user can only update their own profile.
     if (req.user?.id !== req.params.id) {
-      res.status(403).json({ message: "Forbidden: You can only update your own profile." });
+      res
+        .status(403)
+        .json({ message: "Forbidden: You can only update your own profile." });
       return;
     }
 
@@ -46,8 +47,10 @@ export const deletePatient: RequestHandler = async (req, res) => {
   try {
     // Security check: ensure the logged-in user can only delete their own profile.
     if (req.user?.id !== req.params.id) {
-        res.status(403).json({ message: "Forbidden: You can only delete your own profile." });
-        return;
+      res
+        .status(403)
+        .json({ message: "Forbidden: You can only delete your own profile." });
+      return;
     }
 
     const patient = await deletePatientService(req.params.id);

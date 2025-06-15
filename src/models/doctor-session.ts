@@ -18,32 +18,53 @@ interface IDoctorSession extends Document {
   notes?: string;
 }
 
-const doctorSessionSchema = new Schema<IDoctorSession>({
-  doctor: { type: Schema.Types.ObjectId, ref: 'Doctor', required: true, index: true },
-  center: { type: Schema.Types.ObjectId, ref: 'Center', required: true, index: true },
-  sessionDate: { type: Date, required: true },
-  sessionStartTime: { type: String, required: true, trim: true },
-  sessionEndTime: { type: String, required: true, trim: true },
-  recurring: { type: Boolean, default: false },
-  recurringFrequency: {
-    type: String,
-    enum: Object.values(RecurringFrequency),
-    required: function(this: IDoctorSession) { return this.recurring; }
+const doctorSessionSchema = new Schema<IDoctorSession>(
+  {
+    doctor: {
+      type: Schema.Types.ObjectId,
+      ref: "Doctor",
+      required: true,
+      index: true,
+    },
+    center: {
+      type: Schema.Types.ObjectId,
+      ref: "Center",
+      required: true,
+      index: true,
+    },
+    sessionDate: { type: Date, required: true },
+    sessionStartTime: { type: String, required: true, trim: true },
+    sessionEndTime: { type: String, required: true, trim: true },
+    recurring: { type: Boolean, default: false },
+    recurringFrequency: {
+      type: String,
+      enum: Object.values(RecurringFrequency),
+      required: function (this: IDoctorSession) {
+        return this.recurring;
+      },
+    },
+    customRecurringDays: {
+      type: [String],
+      required: function (this: IDoctorSession) {
+        return this.recurringFrequency === RecurringFrequency.CUSTOM;
+      },
+    },
+    numberOfAppointments: { type: Number, required: true, min: 1 },
+    availableAppointments: { type: Number },
+    ongoingNumber: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: Object.values(SessionStatus),
+      default: SessionStatus.NOT_STARTED,
+    },
+    appointments: [{ type: Schema.Types.ObjectId, ref: "PatientAppointment" }],
+    notes: { type: String, required: false, trim: true },
   },
-  customRecurringDays: {
-    type: [String],
-    required: function(this: IDoctorSession) { return this.recurringFrequency === RecurringFrequency.CUSTOM; }
-  },
-  numberOfAppointments: { type: Number, required: true, min: 1 },
-  availableAppointments: { type: Number },
-  ongoingNumber: { type: Number, default: 0 },
-  status: { type: String, enum: Object.values(SessionStatus), default: SessionStatus.NOT_STARTED },
-  appointments: [{ type: Schema.Types.ObjectId, ref: 'PatientAppointment' }],
-  notes: { type: String, required: false, trim: true },
-}, { timestamps: true });
+  { timestamps: true },
+);
 
 // Middleware to set availableAppointments equal to numberOfAppointments when a new session is created.
-doctorSessionSchema.pre('save', function(next) {
+doctorSessionSchema.pre("save", function (next) {
   if (this.isNew) {
     this.availableAppointments = this.numberOfAppointments;
   }

@@ -9,7 +9,9 @@ export const updatePatientService = async (
   id: string,
   payload: TUpdatePatientPayload,
 ) => {
-  return await Patient.findByIdAndUpdate(id, payload, { new: true }).select("-password");
+  return await Patient.findByIdAndUpdate(id, payload, { new: true }).select(
+    "-password",
+  );
 };
 
 export const deletePatientService = async (id: string) => {

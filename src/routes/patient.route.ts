@@ -13,19 +13,9 @@ const router = Router();
 router.get("/:id", authGuard, getPatientById);
 
 // Only a user with the 'patient' role can update their own profile
-router.put(
-  "/:id",
-  authGuard,
-  rolesGuard(["patient"]),
-  updatePatient,
-);
+router.put("/:id", authGuard, rolesGuard(["patient"]), updatePatient);
 
 // Only a user with the 'patient' role can delete their own profile
-router.delete(
-  "/:id",
-  authGuard,
-  rolesGuard(["patient"]),
-  deletePatient,
-);
+router.delete("/:id", authGuard, rolesGuard(["patient"]), deletePatient);
 
 export default router;

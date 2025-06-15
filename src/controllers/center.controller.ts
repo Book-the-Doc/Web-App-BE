@@ -7,7 +7,6 @@ import {
 } from "../services/center.service";
 import { TUpdateCenterPayload } from "../types/center.type";
 
-
 /**
  * @description Get all centers' public profiles.
  * @route GET /api/centers
@@ -18,9 +17,11 @@ export const getAllCenters: RequestHandler = async (req, res) => {
     const centers = await getAllCentersService();
     res.json(centers);
   } catch (error: any) {
-    res.status(500).json({ message: "An error occurred while fetching centers." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching centers." });
   }
-}
+};
 
 /**
  * @description Get a center's public profile by its ID.
@@ -36,7 +37,9 @@ export const getCenterById: RequestHandler = async (req, res) => {
     }
     res.json(center);
   } catch (error: any) {
-    res.status(500).json({ message: "An error occurred while fetching the center." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching the center." });
   }
 };
 
@@ -49,7 +52,9 @@ export const updateCenter: RequestHandler = async (req, res) => {
   try {
     // Security check: Ensure the logged-in user's ID matches the center ID in the params.
     if (req.user?.id !== req.params.id) {
-      res.status(403).json({ message: "Forbidden: You can only update your own profile." });
+      res
+        .status(403)
+        .json({ message: "Forbidden: You can only update your own profile." });
       return;
     }
 
@@ -64,7 +69,9 @@ export const updateCenter: RequestHandler = async (req, res) => {
     }
     res.json(center);
   } catch (error: any) {
-    res.status(500).json({ message: "An error occurred while updating the center." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while updating the center." });
   }
 };
 
@@ -77,8 +84,10 @@ export const deleteCenter: RequestHandler = async (req, res) => {
   try {
     // Security check: Ensure the logged-in user's ID matches the center ID in the params.
     if (req.user?.id !== req.params.id) {
-        res.status(403).json({ message: "Forbidden: You can only delete your own profile." });
-        return;
+      res
+        .status(403)
+        .json({ message: "Forbidden: You can only delete your own profile." });
+      return;
     }
 
     const center = await deleteCenterService(req.params.id);
@@ -89,6 +98,8 @@ export const deleteCenter: RequestHandler = async (req, res) => {
     }
     res.json({ message: "Center deleted successfully" });
   } catch (error: any) {
-    res.status(500).json({ message: "An error occurred while deleting the center." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting the center." });
   }
 };

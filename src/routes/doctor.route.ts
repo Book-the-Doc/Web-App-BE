@@ -1,12 +1,12 @@
 import { Router } from "express";
 import {
-    registerDoctor,
-    createDoctorSession,
-    getAllDoctors,
-    getDoctorById,
-    getDoctorsByCenter,
-    updateDoctor,
-    deleteDoctor
+  registerDoctor,
+  createDoctorSession,
+  getAllDoctors,
+  getDoctorById,
+  getDoctorsByCenter,
+  updateDoctor,
+  deleteDoctor,
 } from "../controllers/doctor.controller";
 import authGuard from "../middlewares/auth.guard";
 import rolesGuard from "../middlewares/role.guard";
@@ -23,7 +23,6 @@ router.get("/:doctorId", getDoctorById);
 // Get all doctors associated with a specific center
 router.get("/center/:centerId", getDoctorsByCenter);
 
-
 // --- PROTECTED CENTER ROUTES ---
 // Register a new doctor under the currently logged-in center
 router.post("/register", authGuard, rolesGuard(["center"]), registerDoctor);
@@ -36,6 +35,5 @@ router.put("/:doctorId", authGuard, rolesGuard(["center"]), updateDoctor);
 
 // Delete a doctor's association from the logged-in center
 router.delete("/:doctorId", authGuard, rolesGuard(["center"]), deleteDoctor);
-
 
 export default router;

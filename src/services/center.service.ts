@@ -1,7 +1,6 @@
 import Center from "../models/center";
 import { TUpdateCenterPayload } from "../types/center.type";
 
-
 /**
  * Fetches all centers from the database.
  * @returns An array of all center objects.
@@ -9,7 +8,6 @@ import { TUpdateCenterPayload } from "../types/center.type";
 export const getAllCentersService = async () => {
   return await Center.find().select("-password");
 };
-
 
 /**
  * Fetches a single center by its ID from the database.
@@ -32,7 +30,9 @@ export const updateCenterService = async (
   payload: TUpdateCenterPayload,
 ) => {
   // { new: true } ensures the updated document is returned.
-  return await Center.findByIdAndUpdate(id, payload, { new: true }).select("-password");
+  return await Center.findByIdAndUpdate(id, payload, { new: true }).select(
+    "-password",
+  );
 };
 
 /**

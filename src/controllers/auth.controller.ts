@@ -12,6 +12,7 @@ import {
   resetPasswordService,
   sendEmail,
   validateEmailResetToken,
+  logoutUserService,
 } from "../services/auth.service";
 import { Gender, TUserRole } from "../types/auth.type";
 
@@ -24,6 +25,7 @@ export const registerPatient = async (req: Request, res: Response) => {
     dob,
     password,
     googleId,
+    phone,
   }: {
     firstName: string;
     lastName: string;
@@ -31,7 +33,8 @@ export const registerPatient = async (req: Request, res: Response) => {
     gender: Gender;
     dob: Date;
     password: string;
-    googleId?: string;
+    googleId: string;
+    phone: string;
   } = req.body;
   try {
     const result = await registerPatientService(
@@ -42,6 +45,7 @@ export const registerPatient = async (req: Request, res: Response) => {
       dob,
       password,
       googleId,
+      phone,
     );
     res.json(result);
   } catch (error: any) {
@@ -63,7 +67,7 @@ export const registerCenter = async (req: Request, res: Response) => {
     email: string;
     phone: string;
     password: string;
-    googleId?: string;
+    googleId: string;
   } = req.body;
   try {
     const result = await registerCenterService(
@@ -97,8 +101,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const logoutUser = async (req: Request, res: Response) => {
   try {
-    const { refreshToken } = req.body;
-    await RefreshToken.findOneAndDelete({ token: refreshToken });
+    const { userId, refreshToken } = req.body;
+    await logoutUserService(userId, refreshToken);
     res.json({ message: "Logout Success" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -128,7 +132,9 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
 
   // Check if passport returned a user profile
   if (!userProfile || !userProfile.emails || userProfile.emails.length === 0) {
-    return res.redirect(`${process.env.FRONTEND_URL}/login?error=google-auth-failed`);
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/login?error=google-auth-failed`,
+    );
   }
 
   const userEmail = userProfile.emails[0].value;
@@ -140,7 +146,10 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
     const googleUser = await getGoogleUserById(googleId);
     if (googleUser) {
       // User exists, log them in and create tokens
-      const result = await createTokens(googleUser.id, googleUser.role as TUserRole);
+      const result = await createTokens(
+        googleUser.id,
+        googleUser.role as TUserRole,
+      );
       const cookiePayload = {
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
@@ -172,7 +181,9 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
     );
   } catch (error) {
     console.error("Google auth callback error:", error);
-    res.status(500).redirect(`${process.env.FRONTEND_URL}/login?error=server-error`);
+    res
+      .status(500)
+      .redirect(`${process.env.FRONTEND_URL}/login?error=server-error`);
   }
 };
 
@@ -187,7 +198,10 @@ export const forgotPasswordEmailCheck = async (
       res.status(404).json({ message: "User not found" });
       return;
     }
-    const emailResetToken = await createEmailResetToken(user._id, user.role as TUserRole);
+    const emailResetToken = await createEmailResetToken(
+      user._id,
+      user.role as TUserRole,
+    );
     await sendEmail(email, "Reset Password", "reset-password", {
       resetLink: `${process.env.FRONTEND_URL}/forgot-password/reset-password?token=${emailResetToken}`,
       name: (user as any).firstName || (user as any).centerName,
