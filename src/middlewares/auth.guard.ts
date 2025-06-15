@@ -1,13 +1,8 @@
-import { Response, NextFunction } from "express";
+import { RequestHandler } from "express";
 import { verify } from "jsonwebtoken";
 import { TJwtPayload } from "../types/auth.type";
-import IRequestWithUser from "../interfaces/request-with-user.interface";
 
-const authGuard = (
-  req: IRequestWithUser,
-  res: Response,
-  next: NextFunction,
-) => {
+const authGuard: RequestHandler = (req, res, next) => {
   const authHeader = req.header("Authorization");
 
   if (!authHeader) {
@@ -15,14 +10,14 @@ const authGuard = (
     return;
   }
   if (authHeader.split(" ")[0] !== "Bearer") {
-    return res
-      .status(401)
-      .json({ message: "Invalid token, authorization denied" });
+    res.status(401).json({ message: "Invalid token, authorization denied" });
+    return;
   }
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ message: "No token, authorization denied" });
+    res.status(401).json({ message: "No token, authorization denied" });
+    return;
   }
 
   try {

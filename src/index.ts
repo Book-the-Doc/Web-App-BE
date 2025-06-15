@@ -2,6 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db";
 import authRoutes from "./routes/auth.route";
+import patientRoutes from "./routes/patient.route";
+import centerRoutes from "./routes/center.route";
+import doctorRoutes from "./routes/doctor.route";
 import cors from "cors";
 import session from "express-session";
 import passport from "passport";
@@ -37,6 +40,9 @@ app.use(passport.session());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/patient", patientRoutes);
+app.use("/api/center", centerRoutes);
+app.use("/api/doctor", doctorRoutes);
 
 const PORT = process.env.PORT || 5000;
 

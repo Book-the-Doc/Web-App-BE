@@ -9,21 +9,31 @@ import handlebars from "handlebars";
 import fs from "fs";
 import path from "path";
 
+/**
+ * Logs in a user (patient or center) by verifying their credentials.
+ * @param email The user's email.
+ * @param password The user's password.
+ * @returns An object with access and refresh tokens.
+ */
 export const loginUserService = async (email: string, password: string) => {
-  let user = await Patient.findOne({ email });
+  // Correctly find a user in EITHER the Patient OR Center collection.
+  // This works now because the fixed registration logic ensures emails are unique.
+  const user =
+    (await Patient.findOne({ email })) || (await Center.findOne({ email }));
+
+  // If no user is found with that email, throw an error.
   if (!user) {
-    user = await Center.findOne({ email });
-    if (!user) {
-      throw new Error("Invalid credentials");
-    }
+    throw new Error("Invalid credentials");
   }
 
+  // Compare the provided password with the stored hash.
   const isMatch = await compare(password, user.password);
   if (!isMatch) {
     throw new Error("Invalid credentials");
   }
 
-  return createTokens(user.id, user.role);
+  // Create tokens with the correct role from the found user object.
+  return createTokens(user.id, user.role as TUserRole);
 };
 
 export const refreshAccessTokenService = async (
@@ -88,6 +98,10 @@ export const refreshAccessTokenService = async (
   };
 };
 
+/**
+ * Registers a new patient.
+ * @description Checks if email exists in EITHER patient or center collections first.
+ */
 export const registerPatientService = async (
   firstName: string,
   lastName: string,
@@ -96,6 +110,7 @@ export const registerPatientService = async (
   dob: Date,
   password: string,
   googleId: string,
+  phone: string,
 ) => {
   const existingPatient = await Patient.findOne({ email });
   const existingCenter = await Center.findOne({ email });
@@ -115,15 +130,20 @@ export const registerPatientService = async (
     dob,
     password: password !== "" ? hashedPassword : "",
     googleId: googleId || null,
+    phone,
   });
   await newUser.save();
   if (googleId) {
-    return createTokens(newUser.id, newUser.role);
+    return createTokens(newUser.id, newUser.role as TUserRole);
   }
 
   return { message: "Registration Success" };
 };
 
+/**
+ * Registers a new center.
+ * @description Checks if email exists in EITHER patient or center collections first.
+ */
 export const registerCenterService = async (
   centerName: string,
   email: string,
@@ -131,10 +151,13 @@ export const registerCenterService = async (
   password: string,
   googleId: string,
 ) => {
-  const existingUser = await Center.findOne({ email });
+  // FIX: Check for email existence in both collections to prevent duplicates.
+  const existingUser =
+    (await Patient.findOne({ email })) || (await Center.findOne({ email }));
   if (existingUser) {
     throw new Error("User already exists");
   }
+
   const salt = await genSalt(10);
   const hashedPassword = await hash(password, salt);
   const newUser = new Center({
@@ -146,27 +169,31 @@ export const registerCenterService = async (
   });
   await newUser.save();
   if (googleId) {
-    return createTokens(newUser.id, newUser.role);
+    return createTokens(newUser.id, newUser.role as TUserRole);
   }
   return { message: "Registration Success" };
 };
 
+/**
+ * Gets a user by email from either collection.
+ */
 export const getUserByEmail = async (email: string) => {
-  const patient = await Patient.findOne({ email, googleId: null });
-  let center = null;
-  if (!patient) {
-    center = await Center.findOne({ email, googleId: null });
-  }
-  return patient || center;
+  // Correctly find a user in either collection
+  const user =
+    (await Patient.findOne({ email, googleId: null })) ||
+    (await Center.findOne({ email, googleId: null }));
+  return user;
 };
 
+/**
+ * Gets a Google-authenticated user by their Google ID from either collection.
+ */
 export const getGoogleUserById = async (googleId: string) => {
-  const patient = await Patient.findOne({ googleId: googleId });
-  let center = null;
-  if (!patient) {
-    center = await Center.findOne({ googleId: googleId });
-  }
-  return patient || center;
+  // Correctly find a user in either collection
+  const user =
+    (await Patient.findOne({ googleId: googleId })) ||
+    (await Center.findOne({ googleId: googleId }));
+  return user;
 };
 
 export const createTokens = async (id: string, role: TUserRole) => {
@@ -185,17 +212,20 @@ export const createTokens = async (id: string, role: TUserRole) => {
   }
 
   const accessToken = jwt.sign(payload, accessTokenSecret, {
-    expiresIn: "1m",
+    expiresIn: "10m",
   });
 
   const refreshToken = jwt.sign(payload, refreshTokenSecret, {
     expiresIn: "7d",
   });
 
+  // Ensure previous refresh token is removed if it exists
+  await RefreshToken.findOneAndDelete({ userId: id });
+
   const refreshTokenDoc = new RefreshToken({
     token: refreshToken,
     userId: id,
-    userType: role,
+    userType: role, // This now correctly gets 'center' or 'patient'
   });
   await refreshTokenDoc.save();
 
@@ -203,8 +233,8 @@ export const createTokens = async (id: string, role: TUserRole) => {
     accessToken,
     refreshToken,
     userId: id,
-    userType: role,
-    expiredAt: new Date(Date.now() + 3600000),
+    userType: role, // This will now correctly be 'center' when a center logs in
+    expiredAt: new Date(Date.now() + 600000), // 10 minutes from now
   };
 };
 
