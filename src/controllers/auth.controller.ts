@@ -12,6 +12,7 @@ import {
   resetPasswordService,
   sendEmail,
   validateEmailResetToken,
+  logoutUserService,
 } from "../services/auth.service";
 import { Gender } from "../types/auth.type";
 
@@ -31,7 +32,7 @@ export const registerPatient = async (req: Request, res: Response) => {
     gender: Gender;
     dob: Date;
     password: string;
-    googleId?: string;
+    googleId: string;
   } = req.body;
   try {
     const result = await registerPatientService(
@@ -63,7 +64,7 @@ export const registerCenter = async (req: Request, res: Response) => {
     email: string;
     phone: string;
     password: string;
-    googleId?: string;
+    googleId: string;
   } = req.body;
   try {
     const result = await registerCenterService(
@@ -97,8 +98,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const logoutUser = async (req: Request, res: Response) => {
   try {
-    const { refreshToken } = req.body;
-    await RefreshToken.findOneAndDelete({ token: refreshToken });
+    const { userId, refreshToken } = req.body;
+    await logoutUserService(userId, refreshToken);
     res.json({ message: "Logout Success" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
