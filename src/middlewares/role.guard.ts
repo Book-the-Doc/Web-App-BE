@@ -4,7 +4,6 @@ import { TUserRole } from "../types/auth.type";
 const rolesGuard = (roles: TUserRole[]): RequestHandler => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role as TUserRole)) {
-      console.log(req.user?.role);
       res.status(401).json({ message: "Access denied" });
       return;
     }
