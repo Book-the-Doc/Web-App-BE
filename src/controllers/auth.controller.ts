@@ -154,13 +154,13 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
         userId: googleUser.id,
-        userRole: googleUser.role,
+        userType: googleUser.role,
         expiredAt: new Date(Date.now() + 3600000), // 1 hour
       };
       res.cookie("session", JSON.stringify(cookiePayload), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 3600000,
       });
       return res.redirect(`${process.env.FRONTEND_URL!}/dashboard`);
