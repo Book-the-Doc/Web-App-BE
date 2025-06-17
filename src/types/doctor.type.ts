@@ -38,12 +38,11 @@ export enum SessionStatus {
  * Enum for the status of an individual patient's appointment.
  */
 export enum AppointmentStatus {
-  BOOKED = "Booked",
-  COMPLETED = "Completed",
-  CANCELLED = "Cancelled",
-  NO_SHOW = "No-show",
+  PENDING = "pending",
+  COMPLETED = "completed",
+  REJECTED = "rejected",
+  CONFIRMED = "confirmed",
 }
-
 /**
  * Type definition for the payload when registering a new doctor.
  */

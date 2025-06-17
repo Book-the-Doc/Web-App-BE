@@ -194,3 +194,11 @@ export const createDoctorSessionService = async (
     mongoSession.endSession();
   }
 };
+
+export const getSessionsByDoctorIdService = async (doctorId: string) => {
+  const sessions = await DoctorSession.find({ doctor: doctorId });
+  if (!sessions) {
+    throw new Error("Doctor not found.");
+  }
+  return sessions;
+};

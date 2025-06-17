@@ -7,6 +7,7 @@ import {
   getDoctorsByCenterIdService,
   updateDoctorService,
   deleteDoctorService,
+  getSessionsByDoctorIdService,
 } from "../services/doctor.service";
 import {
   TCreateSessionPayload,
@@ -112,5 +113,14 @@ export const createDoctorSession: RequestHandler = async (req, res) => {
     res.status(201).json(newSession);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const getSessionsByDoctorId: RequestHandler = async (req, res) => {
+  try {
+    const sessions = await getSessionsByDoctorIdService(req.params.doctorId);
+    res.status(200).json(sessions);
+  } catch (error: any) {
+    res.status(404).json({ message: error.message });
   }
 };
