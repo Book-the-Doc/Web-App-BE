@@ -70,7 +70,7 @@ const doctorSessionSchema = new Schema<IDoctorSession>(
   { timestamps: true },
 );
 
-// Middleware to set availableAppointments equal to numberOfAppointments when a new session is created.
+// Middleware to set availableAppointments equal to numberOfAppointments when a new session is created
 doctorSessionSchema.pre("save", function (next) {
   if (this.isNew) {
     this.availableAppointments = this.numberOfAppointments;
