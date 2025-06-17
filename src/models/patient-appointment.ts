@@ -11,7 +11,8 @@ const patientAppointmentSchema = new Schema(
     patient: {
       type: Schema.Types.ObjectId,
       ref: "Patient",
-      required: true,
+      required: false,
+      default: null,
     },
     center: {
       type: Schema.Types.ObjectId,
@@ -24,7 +25,7 @@ const patientAppointmentSchema = new Schema(
       required: true,
       index: true,
     },
-    appointmentNumber: {
+    token: {
       type: Number,
       required: true,
     },
@@ -35,14 +36,19 @@ const patientAppointmentSchema = new Schema(
     status: {
       type: String,
       enum: Object.values(AppointmentStatus),
-      default: AppointmentStatus.BOOKED,
+      default: AppointmentStatus.PENDING,
     },
-    reason: {
+    notes: {
       type: String,
       required: false,
       trim: true,
     },
-    notes: {
+    patientName: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    phone: {
       type: String,
       required: false,
       trim: true,
@@ -51,4 +57,4 @@ const patientAppointmentSchema = new Schema(
   { timestamps: true },
 );
 
-export default model("PatientAppointment", patientAppointmentSchema);
+export default model("patientAppointment", patientAppointmentSchema);
