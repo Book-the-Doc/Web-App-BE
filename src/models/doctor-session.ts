@@ -16,6 +16,7 @@ interface IDoctorSession extends Document {
   status: SessionStatus;
   appointments: Schema.Types.ObjectId[];
   notes?: string;
+  kind: string;
 }
 
 const doctorSessionSchema = new Schema<IDoctorSession>(
@@ -59,6 +60,12 @@ const doctorSessionSchema = new Schema<IDoctorSession>(
     },
     appointments: [{ type: Schema.Types.ObjectId, ref: "PatientAppointment" }],
     notes: { type: String, required: false, trim: true },
+    kind: {
+      type: String,
+      enum: ["doctor", "lab"],
+      required: false,
+      default: "doctor",
+    },
   },
   { timestamps: true },
 );

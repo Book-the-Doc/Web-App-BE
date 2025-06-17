@@ -195,8 +195,14 @@ export const createDoctorSessionService = async (
   }
 };
 
-export const getSessionsByDoctorIdService = async (doctorId: string) => {
-  const sessions = await DoctorSession.find({ doctor: doctorId });
+export const getSessionsByDoctorIdService = async (
+  doctorId: string,
+  centerId: string,
+) => {
+  const sessions = await DoctorSession.find({
+    doctor: doctorId,
+    center: centerId,
+  });
   if (!sessions) {
     throw new Error("Doctor not found.");
   }

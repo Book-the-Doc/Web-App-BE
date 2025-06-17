@@ -29,6 +29,9 @@ export const createAppointment = async (req: Request, res: Response) => {
       patientName,
       phone,
     });
+    // then this should update the sessions ongoingNumber by 1
+
+    console.log("Creating appointment with data:", appointment);
     res.status(201).json(appointment);
   } catch (error) {
     res.status(500).json({ message: "Failed to create appointment", error });

@@ -31,8 +31,8 @@ router.post("/register", authGuard, rolesGuard(["center"]), registerDoctor);
 // Create a new session for a doctor at the currently logged-in center
 router.post("/session", authGuard, rolesGuard(["center"]), createDoctorSession);
 
-// Get doctor sessions by doctor ID
-router.get("/session/:doctorId", authGuard, getSessionsByDoctorId);
+// Get doctor sessions by doctor ID and centerID
+router.get("/session/:doctorId/:centerId", authGuard, getSessionsByDoctorId);
 
 // Update a doctor's details (center must be associated with the doctor)
 router.put("/:doctorId", authGuard, rolesGuard(["center"]), updateDoctor);

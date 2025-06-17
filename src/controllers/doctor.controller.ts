@@ -118,7 +118,10 @@ export const createDoctorSession: RequestHandler = async (req, res) => {
 
 export const getSessionsByDoctorId: RequestHandler = async (req, res) => {
   try {
-    const sessions = await getSessionsByDoctorIdService(req.params.doctorId);
+    const sessions = await getSessionsByDoctorIdService(
+      req.params.doctorId,
+      req.params.centerId,
+    );
     res.status(200).json(sessions);
   } catch (error: any) {
     res.status(404).json({ message: error.message });
