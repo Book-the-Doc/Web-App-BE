@@ -6,6 +6,7 @@ import patientRoutes from "./routes/patient.route";
 import centerRoutes from "./routes/center.route";
 import doctorRoutes from "./routes/doctor.route";
 import appointmentRoutes from "./routes/appointment.route";
+import sessionRoutes from "./routes/session.route";
 import cors from "cors";
 import session from "express-session";
 import passport from "passport";
@@ -45,6 +46,7 @@ app.use("/api/patient", patientRoutes);
 app.use("/api/center", centerRoutes);
 app.use("/api/doctor", doctorRoutes);
 app.use("/api/appointment", appointmentRoutes);
+app.use("/api/session", sessionRoutes);
 
 const PORT = process.env.PORT || 5000;
 

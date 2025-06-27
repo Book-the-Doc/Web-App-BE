@@ -4,6 +4,7 @@ import {
   getCenterById,
   updateCenter,
   deleteCenter,
+  getSessions,
 } from "../controllers/center.controller";
 import authGuard from "../middlewares/auth.guard";
 import rolesGuard from "../middlewares/role.guard";
@@ -23,5 +24,14 @@ router.put("/:id", authGuard, rolesGuard(["center"]), updateCenter);
 // Endpoint for a center to delete its own profile.
 // Requires authentication and the user must have the 'center' role.
 router.delete("/:id", authGuard, rolesGuard(["center"]), deleteCenter);
+
+// get all sessions that related to the center
+
+router.get(
+  "/sessions/:centerId",
+  authGuard,
+  rolesGuard(["center"]),
+  getSessions,
+);
 
 export default router;

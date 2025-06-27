@@ -4,6 +4,7 @@ import {
   deleteCenterService,
   getCenterByIdService,
   updateCenterService,
+  getSessionsByCenterIdService,
 } from "../services/center.service";
 import { TUpdateCenterPayload } from "../types/center.type";
 
@@ -101,5 +102,21 @@ export const deleteCenter: RequestHandler = async (req, res) => {
     res
       .status(500)
       .json({ message: "An error occurred while deleting the center." });
+  }
+};
+
+export const getSessions: RequestHandler = async (req, res) => {
+  const centerId = req.params.centerId;
+  try {
+    const sessions = await getSessionsByCenterIdService(centerId);
+    if (!sessions) {
+      res.status(404).json({ message: "No sessions found for this center" });
+      return;
+    }
+    res.json(sessions);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching sessions.", error });
   }
 };

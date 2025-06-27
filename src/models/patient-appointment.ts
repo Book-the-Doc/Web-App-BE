@@ -53,6 +53,12 @@ const patientAppointmentSchema = new Schema(
       required: false,
       trim: true,
     },
+    type: {
+      type: String,
+      enum: ["past", "upcoming"],
+      default: "upcoming",
+      required: true,
+    },
   },
   { timestamps: true },
 );

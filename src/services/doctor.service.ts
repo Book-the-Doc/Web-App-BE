@@ -35,7 +35,8 @@ export const getDoctorByIdService = async (doctorId: string) => {
 export const getDoctorsByCenterIdService = async (centerId: string) => {
   const center = await Center.findById(centerId).populate({
     path: "doctors",
-    select: "doctorName specialty contactNumber",
+    select:
+      "_id doctorName specialty qualification slmcNumber gender contactNumber imageUrl",
   });
   if (!center) {
     throw new Error("Center not found.");
@@ -53,6 +54,7 @@ export const registerDoctorService = async (
   centerId: string,
   payload: TRegisterDoctorPayload,
 ) => {
+  console.log("Registering doctor with payload:", payload);
   const existingDoctor = await Doctor.findOne({
     slmcNumber: payload.slmcNumber,
   });

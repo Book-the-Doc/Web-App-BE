@@ -39,6 +39,22 @@ const doctorSchema = new Schema(
       required: false,
       trim: true,
     },
+    qualification: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other", "Prefer not to say"],
+      required: false,
+      default: "other",
+    },
+    imageUrl: {
+      type: String,
+      required: false,
+      trim: true,
+    },
   },
   { timestamps: true },
 );
