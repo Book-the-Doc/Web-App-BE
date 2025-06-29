@@ -32,6 +32,7 @@ export enum SessionStatus {
   NOT_STARTED = "Not Started",
   ONGOING = "Ongoing",
   FINISHED = "Finished",
+  CANCELLED = "Cancelled",
 }
 
 /**

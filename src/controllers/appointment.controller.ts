@@ -3,6 +3,7 @@ import { TAppointmentType } from "../types/appointment.type";
 import {
   createAppointmentService,
   getAppointmentsBySessionIdService,
+  getUserAppointmentsBySessionIdService,
 } from "../services/appointment.service";
 
 export const createAppointment = async (req: Request, res: Response) => {
@@ -52,5 +53,24 @@ export const getAppointmentsBySessionId = async (
   } catch (error) {
     console.error("Error fetching appointments:", error);
     res.status(500).json({ message: "Failed to fetch appointments", error });
+  }
+};
+
+export const getUserAppointmentsBySessionId = async (
+  req: Request,
+  res: Response,
+) => {
+  const { sessionId, userId } = req.params;
+  try {
+    const appointments = await getUserAppointmentsBySessionIdService(
+      sessionId,
+      userId,
+    );
+    res.status(200).json(appointments);
+  } catch (error) {
+    console.error("Error fetching user appointments:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch user appointments", error });
   }
 };
