@@ -50,8 +50,8 @@ const doctorSessionSchema = new Schema<IDoctorSession>(
         return this.recurringFrequency === RecurringFrequency.CUSTOM;
       },
     },
-    numberOfAppointments: { type: Number, required: true, min: 1 },
-    availableAppointments: { type: Number },
+    numberOfAppointments: { type: Number, required: true, min: 0 },
+    availableAppointments: { type: Number, min: 1, required: true },
     ongoingNumber: { type: Number, default: 0 },
     status: {
       type: String,
@@ -69,13 +69,5 @@ const doctorSessionSchema = new Schema<IDoctorSession>(
   },
   { timestamps: true },
 );
-
-// Middleware to set availableAppointments equal to numberOfAppointments when a new session is created
-doctorSessionSchema.pre("save", function (next) {
-  if (this.isNew) {
-    this.availableAppointments = this.numberOfAppointments;
-  }
-  next();
-});
 
 export default model<IDoctorSession>("DoctorSession", doctorSessionSchema);
