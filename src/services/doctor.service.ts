@@ -15,7 +15,38 @@ import mongoose from "mongoose";
  * @returns A list of all doctors with their associated center names.
  */
 export const getAllDoctorsService = async () => {
-  return Doctor.find().populate("doctorName");
+  const doctors = await Doctor.find()
+    .populate({
+      path: "medicalCenters",
+      select: "centerName",
+      model: Center,
+    })
+    .populate({
+      path: "sessions",
+      select:
+        "sessionDate sessionStartTime sessionEndTime numberOfAppointments status kind appointments doctor center",
+      populate: {
+        path: "center",
+        select: "centerName",
+        model: Center,
+      },
+      model: DoctorSession,
+    });
+
+  return doctors.map((doctor) => {
+    const doctorObj = doctor.toObject();
+    return {
+      ...doctorObj,
+      sessions: (doctorObj.sessions || []).map((session: any) => ({
+        ...session,
+        center: session.center?.centerName || null,
+        doctorDetails: {
+          doctorName: doctorObj.doctorName,
+          specialty: doctorObj.specialty,
+        },
+      })),
+    };
+  });
 };
 
 /**
@@ -35,7 +66,8 @@ export const getDoctorByIdService = async (doctorId: string) => {
 export const getDoctorsByCenterIdService = async (centerId: string) => {
   const center = await Center.findById(centerId).populate({
     path: "doctors",
-    select: "doctorName specialty contactNumber",
+    select:
+      "_id doctorName specialty qualification slmcNumber gender contactNumber imageUrl",
   });
   if (!center) {
     throw new Error("Center not found.");
@@ -53,6 +85,7 @@ export const registerDoctorService = async (
   centerId: string,
   payload: TRegisterDoctorPayload,
 ) => {
+  console.log("Registering doctor with payload:", payload);
   const existingDoctor = await Doctor.findOne({
     slmcNumber: payload.slmcNumber,
   });
@@ -202,9 +235,19 @@ export const getSessionsByDoctorIdService = async (
   const sessions = await DoctorSession.find({
     doctor: doctorId,
     center: centerId,
+  }).populate({
+    path: "doctor",
+    select: "doctorName specialty",
+    model: Doctor,
   });
   if (!sessions) {
     throw new Error("Doctor not found.");
   }
-  return sessions;
+  return sessions.map((session: any) => ({
+    ...session.toObject(),
+    doctorDetails: {
+      doctorName: session.doctor?.doctorName || null,
+      specialty: session.doctor?.specialty || null,
+    },
+  }));
 };

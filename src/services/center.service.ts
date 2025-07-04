@@ -1,4 +1,6 @@
 import Center from "../models/center";
+import doctorSession from "../models/doctor-session";
+import labSession from "../models/lab-session";
 import { TUpdateCenterPayload } from "../types/center.type";
 
 /**
@@ -42,4 +44,27 @@ export const updateCenterService = async (
  */
 export const deleteCenterService = async (id: string) => {
   return await Center.findByIdAndDelete(id);
+};
+
+export const getSessionsByCenterIdService = async (centerId: string) => {
+  const doctorSessions = await doctorSession
+    .find({ center: centerId })
+    .populate({
+      path: "doctor",
+      select: "_id doctorName specialty",
+    });
+
+  const doctorSessionsWithDetails = doctorSessions.map((session: any) => ({
+    ...session.toObject(),
+    doctorDetails: session.doctor
+      ? {
+          _id: session.doctor._id,
+          doctorName: session.doctor.doctorName,
+          specialty: session.doctor.specialty,
+        }
+      : null,
+  }));
+  const labSessions = await labSession.find({ center: centerId });
+
+  return { doctorSessionsWithDetails, labSessions };
 };

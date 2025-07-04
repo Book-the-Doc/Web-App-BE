@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Types } from "mongoose";
 import { RecurringFrequency, SessionStatus } from "../types/doctor.type";
 
 interface IDoctorSession extends Document {
@@ -14,7 +14,7 @@ interface IDoctorSession extends Document {
   availableAppointments: number;
   ongoingNumber: number;
   status: SessionStatus;
-  appointments: Schema.Types.ObjectId[];
+  appointments: Types.ObjectId[];
   notes?: string;
   kind: string;
 }
@@ -58,7 +58,7 @@ const doctorSessionSchema = new Schema<IDoctorSession>(
       enum: Object.values(SessionStatus),
       default: SessionStatus.NOT_STARTED,
     },
-    appointments: [{ type: Schema.Types.ObjectId, ref: "PatientAppointment" }],
+    appointments: [{ type: Schema.Types.ObjectId, ref: "patientAppointment" }],
     notes: { type: String, required: false, trim: true },
     kind: {
       type: String,
