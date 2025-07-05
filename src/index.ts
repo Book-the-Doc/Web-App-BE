@@ -10,7 +10,7 @@ import sessionRoutes from "./routes/session.route";
 import cors from "cors";
 import session from "express-session";
 import passport from "passport";
-
+import medicalTestRoutes from "./routes/medical-test.route";
 const corsConfig = {
   origin: true,
   credentials: true,
@@ -47,6 +47,7 @@ app.use("/api/center", centerRoutes);
 app.use("/api/doctor", doctorRoutes);
 app.use("/api/appointment", appointmentRoutes);
 app.use("/api/session", sessionRoutes);
+app.use("/api/medical-test", medicalTestRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -73,6 +73,12 @@ const centerSchema = new Schema({
       ref: "DoctorSession",
     },
   ],
+  medicalTests: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "medicalTest",
+    },
+  ],
 });
 
 export default model("center", centerSchema);

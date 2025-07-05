@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import Center from "../models/center";
 import doctorSession from "../models/doctor-session";
 import labSession from "../models/lab-session";
@@ -67,4 +68,40 @@ export const getSessionsByCenterIdService = async (centerId: string) => {
   const labSessions = await labSession.find({ center: centerId });
 
   return { doctorSessionsWithDetails, labSessions };
+};
+
+export const getMedicalTestsByCenterIdService = async (centerId: string) => {
+  try {
+    const medicalTests = await Center.findById(centerId)
+      .select("medicalTests")
+      .populate({
+        path: "medicalTests",
+      })
+      .exec();
+    return medicalTests || [];
+  } catch (error) {
+    console.error("Error fetching medical tests:", error);
+    throw new Error("Failed to fetch medical tests.");
+  }
+};
+
+export const addMedicalTestToCenterService = async (
+  centerId: string,
+  medicalTestId: Types.ObjectId,
+) => {
+  try {
+    const center = await Center.findById(centerId);
+    if (!center) {
+      throw new Error("Center not found");
+    }
+    if (center.medicalTests.includes(medicalTestId)) {
+      throw new Error("Medical test already exists in the center");
+    }
+    center.medicalTests.push(medicalTestId);
+    await center.save();
+    return center;
+  } catch (error) {
+    console.error("Error adding medical test to center:", error);
+    throw new Error("Failed to add medical test to center.");
+  }
 };

@@ -5,6 +5,7 @@ import {
   getCenterByIdService,
   updateCenterService,
   getSessionsByCenterIdService,
+  getMedicalTestsByCenterIdService,
 } from "../services/center.service";
 import { TUpdateCenterPayload } from "../types/center.type";
 
@@ -118,5 +119,18 @@ export const getSessions: RequestHandler = async (req, res) => {
     res
       .status(500)
       .json({ message: "An error occurred while fetching sessions.", error });
+  }
+};
+
+export const getCenterMedicalTests: RequestHandler = async (req, res) => {
+  const centerId = req.params.centerId;
+  try {
+    const medicalTests = await getMedicalTestsByCenterIdService(centerId);
+    res.json(medicalTests);
+  } catch (error: any) {
+    res.status(500).json({
+      message: "An error occurred while fetching medical tests.",
+      error,
+    });
   }
 };
