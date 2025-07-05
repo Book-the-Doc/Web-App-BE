@@ -5,6 +5,7 @@ import {
   updateCenter,
   deleteCenter,
   getSessions,
+  getCenterMedicalTests,
 } from "../controllers/center.controller";
 import authGuard from "../middlewares/auth.guard";
 import rolesGuard from "../middlewares/role.guard";
@@ -33,5 +34,6 @@ router.get(
   rolesGuard(["center"]),
   getSessions,
 );
+router.get("/getAllTests/:centerId", getCenterMedicalTests);
 
 export default router;

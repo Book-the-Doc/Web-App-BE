@@ -2,6 +2,7 @@ import { Schema, model, Document, Types } from "mongoose";
 import { SessionStatus } from "../types/doctor.type";
 
 interface ILabSession extends Document {
+  _id: Types.ObjectId;
   center: Schema.Types.ObjectId;
   sessionDate: Date;
   sessionStartTime: string;
@@ -16,6 +17,8 @@ interface ILabSession extends Document {
   technicianName?: string;
   testName: string;
   labRoom?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const labSessionSchema = new Schema<ILabSession>(
@@ -39,33 +42,35 @@ const labSessionSchema = new Schema<ILabSession>(
     sessionDate: { type: Date, required: true },
     sessionStartTime: { type: String, required: true, trim: true },
     sessionEndTime: { type: String, required: true, trim: true },
-    numberOfAppointments: { type: Number, required: true, min: 1 },
-    availableAppointments: { type: Number },
-    ongoingNumber: { type: Number, default: 0 },
+    numberOfAppointments: { type: Number, required: true, min: 0 },
+    availableAppointments: { type: Number, required: true, min: 1 },
+    ongoingNumber: { type: Number, default: 0, required: true },
     status: {
       type: String,
       enum: Object.values(SessionStatus),
       default: SessionStatus.NOT_STARTED,
+      required: true,
     },
-    appointments: [{ type: Schema.Types.ObjectId, ref: "patientAppointment" }],
+    appointments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "patientAppointment",
+        required: true,
+        default: [],
+      },
+    ],
     testDescription: { type: String, required: false, trim: true },
     kind: {
       type: String,
       enum: ["doctor", "lab"],
-      required: false,
-      default: "doctor",
+      required: true,
+      default: "lab",
     },
     testName: { type: String, required: true, trim: true },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: true },
 );
-
-// Middleware to set availableAppointments equal to numberOfAppointments when a new session is created
-labSessionSchema.pre("save", function (next) {
-  if (this.isNew) {
-    this.availableAppointments = this.numberOfAppointments;
-  }
-  next();
-});
 
 export default model<ILabSession>("LabSession", labSessionSchema);
